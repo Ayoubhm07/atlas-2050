@@ -1,0 +1,54 @@
+name: atlas
+
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:?POSTGRES_USER manquant}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD manquant}
+      POSTGRES_DB: ${POSTGRES_DB:?POSTGRES_DB manquant}
+    ports: ["${POSTGRES_PORT:-5432}:5432"]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      retries: 10
+
+  tiles:
+    image: ghcr.io/maplibre/martin:v0.14.2
+    command: ["--listen-addresses", "0.0.0.0:3001"]
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+    ports: ["3001:3001"]
+    depends_on:
+      db: { condition: service_healthy }
+
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v2.17.2
+    command: ["mlflow", "server", "--host", "0.0.0.0", "--port", "5000",
+              "--backend-store-uri", "sqlite:////mlflow/mlflow.db",
+              "--default-artifact-root", "/mlflow/artifacts"]
+    ports: ["5000:5000"]
+    volumes: [mlflow:/mlflow]
+
+  airflow:
+    build: ../pipelines
+    command: ["airflow", "standalone"]
+    environment:
+      AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+      AIRFLOW__CORE__DAGS_FOLDER: /opt/atlas/pipelines/dags
+      ATLAS_DEPARTEMENTS: ${ATLAS_DEPARTEMENTS:-33,13,59}
+      ATLAS_DVF_PERIODES: ${ATLAS_DVF_PERIODES:-2021-s2,2022,2023,2024,2025,2026-s1}
+      ATLAS_DATA_DIR: /opt/atlas/data
+      PYTHONPATH: /opt/atlas/pipelines
+    ports: ["8080:8080"]
+    volumes:
+      - ../pipelines:/opt/atlas/pipelines
+      - ../data:/opt/atlas/data
+    profiles: ["pipeline"]
+
+volumes:
+  pgdata:
+  mlflow:
