@@ -3,6 +3,7 @@ data/
 *.parquet
 *.csv.gz
 mlruns/
+ml/models/
 
 # Python
 __pycache__/

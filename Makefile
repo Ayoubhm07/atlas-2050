@@ -1,7 +1,7 @@
 COMPOSE = docker compose --env-file .env -f infra/docker-compose.yml
 DBT ?= .venv/Scripts/dbt  # Linux/macOS : make gold DBT=.venv/bin/dbt
 
-.PHONY: help env up up-pipeline down api-install api-test api-run lint pipe-install pipe-test ingest silver dbt-install gold load
+.PHONY: help env up up-pipeline down api-install api-test api-run lint pipe-install pipe-test ingest silver dbt-install gold load model
 
 help:            ## Liste des commandes
 	@grep -E '^[a-z-]+:.*##' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  %-14s %s\n", $$1, $$2}'
@@ -32,7 +32,7 @@ lint:            ## Ruff + mypy
 	cd pipelines && ruff check . && mypy atlas_pipelines
 
 pipe-install:    ## Installe les pipelines (Java 17 requis pour PySpark)
-	cd pipelines && pip install -e ".[dev,spark]"
+	cd pipelines && pip install -e ".[dev,spark,ml]"
 
 pipe-test:       ## Tests pipelines + couverture (seuil 80 %)
 	cd pipelines && pytest
@@ -53,3 +53,6 @@ gold:            ## dbt build -> data/gold_build, promu vers data/gold si tout p
 
 load:            ## Charge le gold dans PostGIS (variables POSTGRES_* de .env)
 	cd pipelines && python -m atlas_pipelines.load.postgis
+
+model:           ## Modèle de prix + rapport ml/report.md (gold dans ATLAS_DATA_DIR, MLflow ou mlruns/)
+	cd pipelines && python -m atlas_pipelines.ml.train --out ../ml
