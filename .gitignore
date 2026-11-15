@@ -33,3 +33,9 @@ Thumbs.db
 *.egg-info/
 build/
 dist/
+
+# dbt
+dbt/target/
+dbt/logs/
+dbt/dbt_packages/
+dbt/.user.yml

@@ -1,0 +1,5 @@
+# Environnement dbt séparé des pipelines : dbt-core 1.10 impose pathspec<0.13,
+# incompatible avec mypy récent (venv dédié : dbt/.venv ou /opt/dbt-venv dans l'image).
+dbt-core==1.10.23
+dbt-duckdb==1.9.6
+duckdb==1.5.6

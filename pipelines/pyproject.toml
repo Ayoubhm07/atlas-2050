@@ -8,6 +8,8 @@ dependencies = [
   "tenacity>=9,<10",
   "duckdb>=1.1,<2",
   "pyarrow>=17",
+  "py7zr>=1.1,<2",
+  "psycopg[binary]>=3.2,<4",
 ]
 
 [project.optional-dependencies]

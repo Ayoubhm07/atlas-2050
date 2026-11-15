@@ -33,8 +33,10 @@ Basé sur les vérifications du 2026-11-15 ([sources.md](sources.md)). Périmèt
 - **Ingestion :** API data.ademe.fr, filtre `qs=code_departement_ban:{dep}`, pagination,
   ~400 k à 610 k lignes par département.
 - **Clés :** `identifiant_ban` (= `id` BAN), `id_rnb`, coordonnées Lambert-93.
-- **Règles :** classes `etiquette_dpe` dans A–G ; garder le DPE **le plus récent** par
-  `identifiant_ban` ; DPE postérieurs à juillet 2021 uniquement (méthode actuelle).
+- **Règles :** classes `etiquette_dpe` dans A–G ; DPE établis à partir de juillet 2021
+  uniquement (méthode actuelle). Le silver garde **tout l'historique** par
+  `identifiant_ban` ; une vente ne reçoit que le DPE le plus récent **établi au plus tard
+  à sa date** (jamais un DPE postérieur : fuite temporelle).
 
 ## 3. BAN — référentiel d'adresses (pivot)
 - **Ingestion :** `adresses-{dep}.csv.gz`.
@@ -56,13 +58,23 @@ Basé sur les vérifications du 2026-11-15 ([sources.md](sources.md)). Périmèt
   pas d'atlas AZI dans GASPAR. Gironde : 7 972 arrêtés Cat-Nat, 65 communes en TRI.
   → Sprint 2 : ajouter les plans de prévention (PPRI, endpoint GASPAR des PPR) comme
   signal inondation principal ; AZI reste un complément là où il existe.
+- **PPR (sprint 2) :** `GET /gaspar/pprn?codeInsee=&page=&page_size=` (pages à partir de 1,
+  réponse `content`/`totalPages`). PPRI = `modeleProcedure` PPRN-I ou PPRN-L (submersion).
+  Gironde : 315 procédures, 231 communes avec PPRI.
+- **RGA (sprint 2) :** un appel par IRIS au `ST_PointOnSurface` du contour ; réponse vide
+  (HTTP 200 sans corps) = « inconnu ». Gironde : 775 IRIS sur 837 avec une exposition.
+- **AZI à trois états (gold) :** « oui » si la commune est dans un AZI ; « non » si elle
+  est interrogée sans AZI ET que son département a des AZI ailleurs ; sinon « inconnu »
+  (toute la Gironde).
 
 ## 5. INSEE Filosofi IRIS 2021 + contours IRIS (IGN)
 - **Ingestion :** `BASE_TD_FILO_IRIS_2021_DISP_CSV.zip` + contours IRIS (GPKG).
 - **Piège :** IRIS seulement pour les communes ≥ 5 000 habitants → pour les autres,
   revenu au niveau commune. Utiliser une édition des contours **cohérente avec 2021**
   pour que les codes IRIS correspondent.
-- **À confirmer :** licence IGN et nom du champ code IRIS dans le GPKG.
+- **Vérifié (sprint 2) :** GPKG couche `contours_iris`, champ `code_iris` (9 car.),
+  géométrie `geometrie` en EPSG:4326. Les 339 codes Filosofi 2021 de la Gironde existent
+  tous dans l'édition 2026-01-01 (100 %). Licence IGN : toujours à confirmer.
 
 ## 6. Projections climatiques DRIAS — BLOQUÉ pour l'automatisation
 - Pas d'API : un compte DRIAS gratuit est nécessaire, téléchargement manuel des
@@ -75,6 +87,8 @@ Basé sur les vérifications du 2026-11-15 ([sources.md](sources.md)). Périmèt
 ## Jointures (résumé)
 ```
 DVF.id_parcelle ──► BAN.cad_parcelles ──► BAN.id ──► DPE.identifiant_ban
+  (mesuré en Gironde 2024 : 10,8 % des ventes avec un DPE unique ; cad_parcelles n'est
+   renseigné que pour 43 % des adresses BAN — docs/quality/gold_33_2024.md)
 DVF (lon,lat)   ──► IRIS (ST_Contains) ──► Filosofi, maille DRIAS, RGA
 DVF.code_commune ──► Géorisques Cat-Nat / TRI / AZI
 ```

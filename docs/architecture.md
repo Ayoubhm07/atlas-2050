@@ -50,8 +50,8 @@ flowchart LR
 | Couche | Contenu | Format | Outil |
 |---|---|---|---|
 | bronze | Fichiers bruts tels que publiés + checksum + date | Parquet / CSV.gz | Airflow |
-| silver | Nettoyé, typé, dédoublonné, géocodé BAN, partition `dep/annee` | Parquet | PySpark |
-| gold | Tables métier : transactions, biens, risques, climat, IRIS | Parquet + PostGIS | dbt-duckdb puis chargement PostGIS |
+| silver | Nettoyé, typé, dédoublonné, géocodé BAN, partition `dep/annee` | Parquet | PySpark (DVF), DuckDB (BAN, DPE, Géorisques) |
+| gold | dim_commune, dim_iris, fact_transactions, fact_risques_commune, agg_hex (climat : en attente DRIAS) | Parquet + PostGIS | dbt-duckdb (spatial, h3) puis chargement PostGIS (psycopg COPY) |
 
 ## Clés de jointure
 

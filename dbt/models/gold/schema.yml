@@ -1,0 +1,90 @@
+version: 2
+
+models:
+  - name: dim_commune
+    description: Communes (contour = union des IRIS IGN 2026), point intérieur, adresses BAN.
+    columns:
+      - name: code_insee
+        data_tests: [unique, not_null]
+      - name: nom_commune
+        data_tests: [not_null]
+      - name: nom_recherche
+        description: nom en minuscules sans accents (recherche par préfixe de l'API)
+        data_tests: [not_null]
+      - name: geom_wkb
+        data_tests: [not_null]
+
+  - name: dim_iris
+    description: IRIS IGN 2026 + Filosofi 2021 (revenus) + exposition RGA au point intérieur.
+    columns:
+      - name: code_iris
+        data_tests: [unique, not_null]
+      - name: code_insee
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: ref('dim_commune'), field: code_insee}
+      - name: rga_exposition
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [Exposition faible, Exposition moyenne, Exposition forte, inconnu]
+
+  - name: fact_transactions
+    description: Ventes DVF silver + DPE connu à la date de vente (pivot BAN) + IRIS + H3 r7/r9.
+    columns:
+      - name: id_mutation
+        data_tests: [unique, not_null]
+      - name: code_commune
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: ref('dim_commune'), field: code_insee}
+      - name: type_local
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments: {values: [Maison, Appartement]}
+      - name: prix_m2
+        data_tests: [not_null]
+      - name: h3_r7
+        data_tests: [not_null]
+      - name: h3_r9
+        data_tests: [not_null]
+      - name: dpe_etiquette
+        data_tests: [not_null]
+      - name: dpe_appariement
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [apparie, sans_adresse, sans_dpe, plusieurs_dpe, type_different]
+
+  - name: fact_risques_commune
+    description: Cat-Nat (total, 10 ans), TRI, PPRI, AZI trois états par commune interrogée.
+    columns:
+      - name: code_insee
+        data_tests:
+          - unique
+          - not_null
+          - relationships:
+              arguments: {to: ref('dim_commune'), field: code_insee}
+      - name: azi
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments: {values: [oui, non, inconnu]}
+
+  - name: agg_hex
+    description: >-
+      Agrégats H3 r7/r9 × type × année × DPE (≥ 5 ventes, suppression secondaire
+      anti-différenciation, prix arrondis à 10 €/m²), servis à la carte.
+    columns:
+      - name: id_agg
+        data_tests: [unique, not_null]
+      - name: resolution
+        data_tests:
+          - accepted_values:
+              arguments: {values: [7, 9], quote: false}
+      - name: prix_m2_median
+        data_tests: [not_null]

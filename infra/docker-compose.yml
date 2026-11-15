@@ -43,10 +43,19 @@ services:
       ATLAS_DVF_PERIODES: ${ATLAS_DVF_PERIODES:-2021-s2,2022,2023,2024,2025,2026-s1}
       ATLAS_DATA_DIR: /opt/atlas/data
       PYTHONPATH: /opt/atlas/pipelines
+      # chargement du gold dans PostGIS (service db du même réseau compose)
+      POSTGRES_HOST: db
+      POSTGRES_PORT: "5432"
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports: ["8080:8080"]
     volumes:
       - ../pipelines:/opt/atlas/pipelines
       - ../data:/opt/atlas/data
+      - ../dbt:/opt/atlas/dbt
+    depends_on:
+      db: { condition: service_healthy }
     profiles: ["pipeline"]
 
 volumes:

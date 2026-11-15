@@ -1,0 +1,5 @@
+# Copie de dbt/requirements.txt pour le contexte de build Docker (pipelines/).
+# Garder les deux fichiers identiques.
+dbt-core==1.10.23
+dbt-duckdb==1.9.6
+duckdb==1.5.6

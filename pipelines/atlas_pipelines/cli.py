@@ -10,9 +10,9 @@ from collections.abc import Callable
 
 from atlas_pipelines.config import PipelineConfig
 from atlas_pipelines.http import make_client
-from atlas_pipelines.sources import ban, dpe, drias, dvf, georisques, insee
+from atlas_pipelines.sources import ban, dpe, drias, dvf, georisques, insee, iris, ppr, rga
 
-ORDER = ("dvf", "ban", "dpe", "insee", "georisques", "drias")
+ORDER = ("dvf", "ban", "dpe", "insee", "iris", "georisques", "ppr", "rga", "drias")
 
 
 def _runners(cfg: PipelineConfig) -> dict[str, Callable[[], dict[str, int]]]:
@@ -28,7 +28,10 @@ def _runners(cfg: PipelineConfig) -> dict[str, Callable[[], dict[str, int]]]:
         "ban": with_client(ban.ingest),
         "dpe": with_client(dpe.ingest),
         "insee": with_client(insee.ingest),
+        "iris": with_client(iris.ingest),
         "georisques": with_client(georisques.ingest),
+        "ppr": with_client(ppr.ingest),
+        "rga": with_client(rga.ingest),
         "drias": lambda: drias.ingest(cfg),
     }
 

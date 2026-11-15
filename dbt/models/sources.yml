@@ -1,0 +1,46 @@
+version: 2
+
+# Entrées du gold : silver Parquet (DVF par PySpark, BAN/DPE/Géorisques par DuckDB).
+# Contours IRIS et Filosofi n'ont pas de silver : ce sont des référentiels déjà propres
+# (un IRIS par ligne), lus en bronze et typés dans dim_iris.
+sources:
+  - name: silver
+    tables:
+      - name: dvf
+        config:
+          external_location: >-
+            read_parquet('{{ env_var("ATLAS_DATA_DIR") }}/silver/dvf/*/*/*.parquet',
+            hive_partitioning = true)
+      - name: ban
+        config:
+          external_location: "read_parquet('{{ env_var(\"ATLAS_DATA_DIR\") }}/silver/ban/*.parquet')"
+      - name: dpe
+        config:
+          external_location: "read_parquet('{{ env_var(\"ATLAS_DATA_DIR\") }}/silver/dpe/*.parquet')"
+      - name: catnat
+        config:
+          external_location: "read_parquet('{{ env_var(\"ATLAS_DATA_DIR\") }}/silver/georisques/catnat.parquet')"
+      - name: tri
+        config:
+          external_location: "read_parquet('{{ env_var(\"ATLAS_DATA_DIR\") }}/silver/georisques/tri.parquet')"
+      - name: azi
+        config:
+          external_location: "read_parquet('{{ env_var(\"ATLAS_DATA_DIR\") }}/silver/georisques/azi.parquet')"
+      - name: pprn
+        config:
+          external_location: "read_parquet('{{ env_var(\"ATLAS_DATA_DIR\") }}/silver/georisques/pprn.parquet')"
+      - name: couverture
+        config:
+          external_location: "read_parquet('{{ env_var(\"ATLAS_DATA_DIR\") }}/silver/georisques/couverture.parquet')"
+      - name: rga
+        config:
+          external_location: "read_parquet('{{ env_var(\"ATLAS_DATA_DIR\") }}/silver/georisques/rga.parquet')"
+
+  - name: referentiel
+    tables:
+      - name: contours_iris
+        config:
+          external_location: "read_parquet('{{ env_var(\"ATLAS_DATA_DIR\") }}/bronze/iris/contours_iris.parquet')"
+      - name: filosofi
+        config:
+          external_location: "read_parquet('{{ env_var(\"ATLAS_DATA_DIR\") }}/bronze/insee/filosofi_iris_2021.parquet')"

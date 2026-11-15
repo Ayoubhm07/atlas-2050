@@ -57,7 +57,9 @@ def communes_from_ban(cfg: PipelineConfig) -> list[str]:
     return [r[0] for r in rows]
 
 
-def _write(rows: Iterable[tuple[str, str, str | None]], dest_name: str, cfg: PipelineConfig) -> int:
+def write_payloads(
+    rows: Iterable[tuple[str, str, str | None]], dest_name: str, cfg: PipelineConfig
+) -> int:
     data = list(rows)
     table = pa.table(
         {
@@ -92,6 +94,6 @@ def ingest(cfg: PipelineConfig, client: httpx.Client) -> dict[str, int]:
             if not records:
                 out.append((endpoint, code, None))  # vrai NULL SQL
             out.extend((endpoint, code, json.dumps(r, ensure_ascii=False)) for r in records)
-        counts[endpoint] = _write(out, f"{endpoint}.parquet", cfg)
+        counts[endpoint] = write_payloads(out, f"{endpoint}.parquet", cfg)
         logger.info("Géorisques %s : %d lignes pour %d communes", endpoint, len(out), len(communes))
     return counts

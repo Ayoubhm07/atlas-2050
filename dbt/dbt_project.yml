@@ -1,0 +1,20 @@
+name: atlas
+version: "0.2.0"
+config-version: 2
+profile: atlas
+
+model-paths: ["models"]
+macro-paths: ["macros"]
+test-paths: ["tests"]
+target-path: target
+clean-targets: [target, dbt_packages, logs]
+
+vars:
+  # date de référence du compteur Cat-Nat « 10 dernières années » ; figée par run
+  date_reference: "{{ run_started_at.strftime('%Y-%m-%d') }}"
+
+models:
+  atlas:
+    gold:
+      +materialized: external
+      +format: parquet

@@ -1,0 +1,16 @@
+# Profil lu par dbt avec --profiles-dir dbt (aucun secret : DuckDB local).
+# ATLAS_DATA_DIR : dossier data/ (silver en entrée). dbt écrit dans data/gold_build ;
+# data/gold (lu par le chargeur PostGIS) n'est remplacé qu'après un `dbt build` réussi,
+# tests compris : `python -m atlas_pipelines.load.promote` (make gold, DAG atlas_gold).
+atlas:
+  target: local
+  outputs:
+    local:
+      type: duckdb
+      path: "{{ env_var('ATLAS_DATA_DIR') }}/gold_build/atlas.duckdb"
+      external_root: "{{ env_var('ATLAS_DATA_DIR') }}/gold_build"
+      threads: 4
+      extensions:
+        - spatial
+        - name: h3
+          repo: community

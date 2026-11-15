@@ -1,7 +1,8 @@
 """DAGs ATLAS 2050 : un DAG par source + nettoyage silver, chaînés par Datasets Airflow.
 
-ban ──► georisques            dvf ──► silver_dvf
-dpe, insee, drias : indépendants
+ban ──► georisques, ppr       dvf ──► silver_dvf
+iris ──► rga                  dpe, insee, drias : indépendants
+(silver DuckDB et gold : dags/atlas_gold.py)
 
 Le fichier ne fait que déclarer les DAGs : httpx, duckdb, pyarrow et pyspark sont
 importés à l'exécution des tâches, pas au parsing (rapide pour le scheduler).
@@ -20,7 +21,7 @@ from airflow.datasets import Dataset
 from airflow.operators.python import PythonOperator
 
 DATA = "file:///opt/atlas/data"
-SOURCES = ("dvf", "ban", "dpe", "georisques", "insee", "drias")
+SOURCES = ("dvf", "ban", "dpe", "georisques", "insee", "drias", "iris", "ppr", "rga")
 DS = {name: Dataset(f"{DATA}/bronze/{name}") for name in SOURCES}
 DS_SILVER_DVF = Dataset(f"{DATA}/silver/dvf")
 
@@ -32,6 +33,9 @@ SCHEDULES: dict[str, Any] = {
     "insee": "@once",  # Filosofi IRIS 2021 est la dernière édition publiée
     "drias": None,  # dépôt manuel : déclenché à la main après le dépôt
     "georisques": [DS["ban"]],  # communes issues de la BAN
+    "iris": "@once",  # contours IGN édition 2026 (codes compatibles Filosofi 2021)
+    "ppr": [DS["ban"]],  # PPRN GASPAR par commune BAN
+    "rga": [DS["iris"]],  # un point par IRIS
 }
 
 DEFAULT_ARGS = {
