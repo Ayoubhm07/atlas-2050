@@ -7,10 +7,16 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:?POSTGRES_USER manquant}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD manquant}
       POSTGRES_DB: ${POSTGRES_DB:?POSTGRES_DB manquant}
-    ports: ["${POSTGRES_PORT:-5432}:5432"]
+      # rôles en lecture seule créés au premier démarrage (db/02-roles.sh, db/roles.sql)
+      ATLAS_API_DB_PASSWORD: ${ATLAS_API_DB_PASSWORD:?ATLAS_API_DB_PASSWORD manquant}
+      ATLAS_TILES_DB_PASSWORD: ${ATLAS_TILES_DB_PASSWORD:?ATLAS_TILES_DB_PASSWORD manquant}
+    # loopback seulement : la base n'est jamais exposée sur le réseau de l'hôte
+    ports: ["127.0.0.1:${POSTGRES_PORT:-5432}:5432"]
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./db/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+      - ./db/02-roles.sh:/docker-entrypoint-initdb.d/02-roles.sh:ro
+      - ./db/roles.sql:/opt/atlas-db/roles.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
@@ -18,19 +24,51 @@ services:
 
   tiles:
     image: ghcr.io/maplibre/martin:v0.14.2
-    command: ["--listen-addresses", "0.0.0.0:3001"]
+    # configuration explicite : agrégats et contours seulement, jamais les ventes
+    command: ["--config", "/config/config.yaml"]
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
-    ports: ["3001:3001"]
+      # rôle atlas_tiles : SELECT sur agg_hex, dim_commune, dim_iris seulement, lecture seule
+      DATABASE_URL: postgresql://atlas_tiles:${ATLAS_TILES_DB_PASSWORD}@db:5432/${POSTGRES_DB}
+    volumes:
+      - ./martin/config.yaml:/config/config.yaml:ro
+    ports: ["127.0.0.1:3001:3001"]
     depends_on:
       db: { condition: service_healthy }
+
+  api:
+    build:
+      context: ..
+      dockerfile: apps/api/Dockerfile
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_PORT: "5432"
+      # rôle atlas_api : SELECT sur le gold seulement, lecture seule, non superutilisateur
+      POSTGRES_USER: atlas_api
+      POSTGRES_PASSWORD: ${ATLAS_API_DB_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      ATLAS_DEPARTEMENTS: ${ATLAS_DEPARTEMENTS:-33,13,59}
+      # IP du proxy de confiance dont uvicorn accepte X-Forwarded-For (docs/api/README.md)
+      FORWARDED_ALLOW_IPS: ${API_FORWARDED_ALLOW_IPS:-127.0.0.1}
+      API_CORS_ORIGINS: ${API_CORS_ORIGINS:-http://localhost:3000}
+      API_RATE_LIMIT: ${API_RATE_LIMIT:-60/minute}
+      ATLAS_ML_DIR: /opt/atlas/ml
+    volumes:
+      - ../ml:/opt/atlas/ml:ro
+    ports: ["127.0.0.1:8000:8000"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(urllib.request.urlopen('http://127.0.0.1:8000/health').status != 200)"]
+      interval: 15s
+      retries: 5
+    depends_on:
+      db: { condition: service_healthy }
+    profiles: ["api"]
 
   mlflow:
     image: ghcr.io/mlflow/mlflow:v2.17.2
     command: ["mlflow", "server", "--host", "0.0.0.0", "--port", "5000",
               "--backend-store-uri", "sqlite:////mlflow/mlflow.db",
               "--default-artifact-root", "/mlflow/artifacts"]
-    ports: ["5000:5000"]
+    ports: ["127.0.0.1:5000:5000"]
     volumes: [mlflow:/mlflow]
 
   airflow:
@@ -43,13 +81,13 @@ services:
       ATLAS_DVF_PERIODES: ${ATLAS_DVF_PERIODES:-2021-s2,2022,2023,2024,2025,2026-s1}
       ATLAS_DATA_DIR: /opt/atlas/data
       PYTHONPATH: /opt/atlas/pipelines
-      # chargement du gold dans PostGIS (service db du même réseau compose)
+      # chargement du gold dans PostGIS : le chargeur garde le rôle propriétaire
       POSTGRES_HOST: db
       POSTGRES_PORT: "5432"
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
-    ports: ["8080:8080"]
+    ports: ["127.0.0.1:8080:8080"]
     volumes:
       - ../pipelines:/opt/atlas/pipelines
       - ../data:/opt/atlas/data

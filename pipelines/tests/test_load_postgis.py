@@ -140,6 +140,18 @@ class FakeConn:
         self.commits += 1
 
 
+def test_swap_regrants_least_privilege_readers() -> None:
+    fact = lp.swap_sql(lp.TableSpec("fact_transactions", "id_mutation", "point"))
+    grants = [s for s in fact if "GRANT" in s]
+    assert len(grants) == 1 and '"atlas_api"' in grants[0]  # jamais atlas_tiles sur les ventes
+    assert 'GRANT SELECT ON gold."fact_transactions"' in grants[0]
+    for name in ("agg_hex", "dim_commune", "dim_iris"):
+        grants = [s for s in lp.swap_sql(lp.TableSpec(name, "k", "none")) if "GRANT" in s]
+        granted = {r for r in ("atlas_api", "atlas_tiles") if any(f'"{r}"' in g for g in grants)}
+        assert granted == {"atlas_api", "atlas_tiles"}
+        assert all("SELECT 1 FROM pg_roles" in g for g in grants)
+
+
 def test_load_stages_all_then_swaps_once(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     import psycopg
 

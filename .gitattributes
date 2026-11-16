@@ -1,0 +1,3 @@
+# Scripts exécutés dans des conteneurs Linux : jamais de CRLF (autocrlf=true sous Windows)
+*.sh text eol=lf
+infra/db/*.sql text eol=lf

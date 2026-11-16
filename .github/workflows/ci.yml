@@ -19,9 +19,12 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+      # l'API réutilise le modèle de prix du sprint 3 (atlas_pipelines.ml)
+      - run: pip install -e "../../pipelines[ml]"
       - run: pip install -e ".[dev]"
       - run: ruff check .
-      - run: mypy src
+      - run: mypy src tests
+      # sans PostGIS ni modèle sauvegardé : les tests d'intégration sont ignorés
       - run: pytest
 
   pipelines:

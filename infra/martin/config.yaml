@@ -1,0 +1,44 @@
+# Martin : tuiles vectorielles des AGRÉGATS seulement (ADR 0005).
+# auto_publish: false — sans cette ligne Martin publierait toute table géométrique du
+# gold, dont gold.fact_transactions (une ligne par vente, prix et parcelle). Seules les
+# sources listées ici existent ; chaque source ne publie que les colonnes listées.
+listen_addresses: "0.0.0.0:3001"
+worker_processes: 2
+postgres:
+  connection_string: ${DATABASE_URL}
+  auto_publish: false
+  tables:
+    agg_hex:
+      schema: gold
+      table: agg_hex
+      srid: 4326
+      geometry_column: geom
+      geometry_type: POINT
+      properties:
+        h3: text
+        resolution: int4
+        type_local: text
+        annee: text
+        dpe_etiquette: text
+        n_ventes: int8
+        prix_m2_median: int4
+    communes:
+      schema: gold
+      table: dim_commune
+      srid: 4326
+      geometry_column: geom
+      geometry_type: MULTIPOLYGON
+      properties:
+        code_insee: text
+        nom_commune: text
+    iris:
+      schema: gold
+      table: dim_iris
+      srid: 4326
+      geometry_column: geom
+      geometry_type: MULTIPOLYGON
+      properties:
+        code_iris: text
+        code_insee: text
+        nom_iris: text
+        rga_exposition: text

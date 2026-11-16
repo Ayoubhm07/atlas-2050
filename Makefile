@@ -1,7 +1,7 @@
 COMPOSE = docker compose --env-file .env -f infra/docker-compose.yml
 DBT ?= .venv/Scripts/dbt  # Linux/macOS : make gold DBT=.venv/bin/dbt
 
-.PHONY: help env up up-pipeline down api-install api-test api-run lint pipe-install pipe-test ingest silver dbt-install gold load model
+.PHONY: help env up up-pipeline down db-roles api-install api-test api-run api-openapi api-latency lint pipe-install pipe-test ingest silver dbt-install gold load model
 
 help:            ## Liste des commandes
 	@grep -E '^[a-z-]+:.*##' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  %-14s %s\n", $$1, $$2}'
@@ -18,17 +18,26 @@ up-pipeline: env ## Lance aussi Airflow (build PySpark)
 down:            ## Arrête tout
 	$(COMPOSE) --profile pipeline down
 
-api-install:     ## Installe l'API en mode dev
-	cd apps/api && pip install -e ".[dev]"
+db-roles:        ## Crée/met à jour les rôles atlas_api et atlas_tiles (base existante)
+	$(COMPOSE) exec -T db sh /docker-entrypoint-initdb.d/02-roles.sh
+
+api-install:     ## Installe l'API en mode dev (avec le paquet ML des pipelines)
+	cd apps/api && pip install -e "../../pipelines[ml]" && pip install -e ".[dev]"
 
 api-test:        ## Tests API + couverture (seuil 80 %)
 	cd apps/api && pytest
 
 api-run:         ## API en local sur :8000
-	cd apps/api && uvicorn atlas_api.main:app --reload
+	cd apps/api && uvicorn atlas_api.main:app --reload --no-access-log
+
+api-openapi:     ## Exporte docs/api/openapi.json
+	cd apps/api && python -m atlas_api.export_openapi
+
+api-latency:     ## p50/p95 des routes (PostGIS et modèle réels)
+	cd apps/api && python scripts/measure_latency.py
 
 lint:            ## Ruff + mypy
-	cd apps/api && ruff check . && mypy src
+	cd apps/api && ruff check . && mypy src tests
 	cd pipelines && ruff check . && mypy atlas_pipelines
 
 pipe-install:    ## Installe les pipelines (Java 17 requis pour PySpark)

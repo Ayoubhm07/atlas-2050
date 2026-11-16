@@ -5,6 +5,11 @@ Puis, dans UNE transaction : DROP de l'ancienne table et RENAME des nouvelles (t
 index, clés). Un échec avant la bascule laisse le gold en service intact ; relancer
 le chargement repart de zéro (les `__new` résiduelles sont supprimées).
 
+Rôles en lecture (infra/db/roles.sql) : la bascule recrée les tables, donc leurs droits.
+Dans la même transaction, SELECT est redonné à `atlas_api` (tout le gold) et à
+`atlas_tiles` (agg_hex, dim_commune, dim_iris seulement), si ces rôles existent. Le
+chargeur garde le rôle propriétaire.
+
 H3 : l'image `postgis/postgis:16-3.4` ne fournit pas l'extension `h3-pg`
 (vérifié dans pg_available_extensions le 2026-11-15) : les index H3 calculés par dbt
 sont stockés en texte, indexés en btree. Les colonnes de CODES (code_*, id_*, h3*,
@@ -156,6 +161,26 @@ def _index_names(spec: TableSpec) -> list[str]:
     return names
 
 
+API_ROLE = "atlas_api"
+TILES_ROLE = "atlas_tiles"
+TILES_TABLES = frozenset({"agg_hex", "dim_commune", "dim_iris"})
+
+
+def reader_roles(table: str) -> tuple[str, ...]:
+    """Rôles en lecture seule qui reçoivent SELECT sur `gold.<table>` (moindre privilège)."""
+    return (API_ROLE, TILES_ROLE) if table in TILES_TABLES else (API_ROLE,)
+
+
+def grant_sql(spec: TableSpec) -> list[str]:
+    """SELECT pour les rôles lecteurs existants (bloc DO : rôle absent → rien)."""
+    table = f"{SCHEMA}.{ident(spec.name)}"
+    return [
+        f"DO $grant$ BEGIN IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = '{role}') "
+        f"THEN GRANT SELECT ON {table} TO {ident(role)}; END IF; END $grant$"
+        for role in reader_roles(spec.name)
+    ]
+
+
 def swap_sql(spec: TableSpec) -> list[str]:
     """Remplace l'ancienne table par `__new` (à exécuter dans la transaction de bascule)."""
     s, n = SCHEMA, spec.name
@@ -168,7 +193,7 @@ def swap_sql(spec: TableSpec) -> list[str]:
     out += [
         f"ALTER INDEX {s}.{ident(i + '__new')} RENAME TO {ident(i)}" for i in _index_names(spec)
     ]
-    return out
+    return out + grant_sql(spec)
 
 
 def iter_rows(path: Path) -> Iterator[tuple[Any, ...]]:
@@ -202,7 +227,7 @@ def conninfo_from_env() -> str:
     if missing:
         raise RuntimeError(f"Variables PostgreSQL manquantes : {missing}")
     return make_conninfo(
-        host=os.environ.get("POSTGRES_HOST", "localhost"),
+        host=os.environ.get("POSTGRES_HOST", "127.0.0.1"),
         port=os.environ.get("POSTGRES_PORT", "5432"),
         user=os.environ["POSTGRES_USER"],
         password=os.environ["POSTGRES_PASSWORD"],

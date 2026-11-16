@@ -20,7 +20,10 @@ Gironde, compte tenu de ses caractéristiques et des ventes antérieures de son 
   ans précédant la vente ; prix de voisinage ; longitude, latitude, mois de vente.
 - **Prix de voisinage :** médiane des log-prix des 30 ventes du même type les plus
   récentes dans la cellule H3 r7 de la vente et ses 6 voisines (environ 5 km² chacune),
-  lissée vers la médiane départementale. Seules comptent les ventes **strictement
+  lissée vers la médiane départementale. **Seuil de confidentialité (ADR 0005) :** sous
+  5 ventes dans l'anneau, la médiane des voisins n'est pas utilisée (a priori
+  départemental seul, nombre de voisins mis à 0), à l'entraînement comme dans l'API ;
+  sinon le prix d'une vente isolée se lirait dans l'estimation. Seules comptent les ventes **strictement
   antérieures** à la date de la vente et appartenant à **l'ensemble d'entraînement** :
   le prix d'une vente ne peut pas entrer dans sa propre variable (tests
   `tests/test_ml_features.py`).

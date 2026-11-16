@@ -1,0 +1,1814 @@
+{
+  "components": {
+    "schemas": {
+      "CommuneHit": {
+        "properties": {
+          "code_departement": {
+            "title": "Code Departement",
+            "type": "string"
+          },
+          "code_insee": {
+            "title": "Code Insee",
+            "type": "string"
+          },
+          "lat": {
+            "title": "Lat",
+            "type": "number"
+          },
+          "lon": {
+            "title": "Lon",
+            "type": "number"
+          },
+          "nom_commune": {
+            "title": "Nom Commune",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code_insee",
+          "nom_commune",
+          "code_departement",
+          "lon",
+          "lat"
+        ],
+        "title": "CommuneHit",
+        "type": "object"
+      },
+      "CommuneRisques": {
+        "properties": {
+          "azi": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Azi"
+          },
+          "code_insee": {
+            "title": "Code Insee",
+            "type": "string"
+          },
+          "date_reference": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date Reference"
+          },
+          "in_tri": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "In Tri"
+          },
+          "n_catnat": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "N Catnat"
+          },
+          "n_catnat_10ans": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "N Catnat 10Ans"
+          },
+          "n_ppr": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "N Ppr"
+          },
+          "nom_commune": {
+            "title": "Nom Commune",
+            "type": "string"
+          },
+          "ppri": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ppri"
+          },
+          "rga_iris": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "description": "Nombre d'IRIS de la commune par exposition RGA",
+            "title": "Rga Iris",
+            "type": "object"
+          }
+        },
+        "required": [
+          "code_insee",
+          "nom_commune",
+          "n_catnat",
+          "n_catnat_10ans",
+          "date_reference",
+          "in_tri",
+          "ppri",
+          "n_ppr",
+          "azi"
+        ],
+        "title": "CommuneRisques",
+        "type": "object"
+      },
+      "CommuneStats": {
+        "properties": {
+          "code_insee": {
+            "title": "Code Insee",
+            "type": "string"
+          },
+          "groupes": {
+            "items": {
+              "$ref": "#/components/schemas/StatsGroupe"
+            },
+            "title": "Groupes",
+            "type": "array"
+          }
+        },
+        "required": [
+          "code_insee",
+          "groupes"
+        ],
+        "title": "CommuneStats",
+        "type": "object"
+      },
+      "Envelope_CommuneRisques_": {
+        "properties": {
+          "data": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CommuneRisques"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta",
+            "default": {
+              "sources": []
+            }
+          },
+          "success": {
+            "title": "Success",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "success"
+        ],
+        "title": "Envelope[CommuneRisques]",
+        "type": "object"
+      },
+      "Envelope_CommuneStats_": {
+        "properties": {
+          "data": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CommuneStats"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta",
+            "default": {
+              "sources": []
+            }
+          },
+          "success": {
+            "title": "Success",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "success"
+        ],
+        "title": "Envelope[CommuneStats]",
+        "type": "object"
+      },
+      "Envelope_Estimation_": {
+        "properties": {
+          "data": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Estimation"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta",
+            "default": {
+              "sources": []
+            }
+          },
+          "success": {
+            "title": "Success",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "success"
+        ],
+        "title": "Envelope[Estimation]",
+        "type": "object"
+      },
+      "Envelope_Health_": {
+        "properties": {
+          "data": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Health"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta",
+            "default": {
+              "sources": []
+            }
+          },
+          "success": {
+            "title": "Success",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "success"
+        ],
+        "title": "Envelope[Health]",
+        "type": "object"
+      },
+      "Envelope_NoneType_": {
+        "properties": {
+          "data": {
+            "title": "Data",
+            "type": "null"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta",
+            "default": {
+              "sources": []
+            }
+          },
+          "success": {
+            "title": "Success",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "success"
+        ],
+        "title": "Envelope[NoneType]",
+        "type": "object"
+      },
+      "Envelope_list_CommuneHit__": {
+        "properties": {
+          "data": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/CommuneHit"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Data"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta",
+            "default": {
+              "sources": []
+            }
+          },
+          "success": {
+            "title": "Success",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "success"
+        ],
+        "title": "Envelope[list[CommuneHit]]",
+        "type": "object"
+      },
+      "Envelope_list_HexCell__": {
+        "properties": {
+          "data": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/HexCell"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Data"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta",
+            "default": {
+              "sources": []
+            }
+          },
+          "success": {
+            "title": "Success",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "success"
+        ],
+        "title": "Envelope[list[HexCell]]",
+        "type": "object"
+      },
+      "EstimateQuery": {
+        "additionalProperties": false,
+        "description": "POST /estimate (corps JSON) : position (coordonnées OU adresse) + bien.",
+        "properties": {
+          "address": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "minLength": 5,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Adresse géocodée par la BAN ; jamais journalisée ni renvoyée",
+            "title": "Address"
+          },
+          "dependances": {
+            "default": 0,
+            "maximum": 10.0,
+            "minimum": 0.0,
+            "title": "Dependances",
+            "type": "integer"
+          },
+          "dpe": {
+            "anyOf": [
+              {
+                "enum": [
+                  "A",
+                  "B",
+                  "C",
+                  "D",
+                  "E",
+                  "F",
+                  "G"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dpe"
+          },
+          "lat": {
+            "anyOf": [
+              {
+                "maximum": 90.0,
+                "minimum": -90.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lat"
+          },
+          "lon": {
+            "anyOf": [
+              {
+                "maximum": 180.0,
+                "minimum": -180.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lon"
+          },
+          "pieces": {
+            "maximum": 30.0,
+            "minimum": 1.0,
+            "title": "Pieces",
+            "type": "integer"
+          },
+          "surface": {
+            "description": "Surface habitable, m²",
+            "maximum": 1000.0,
+            "minimum": 9.0,
+            "title": "Surface",
+            "type": "number"
+          },
+          "surface_terrain": {
+            "anyOf": [
+              {
+                "maximum": 10000.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Surface Terrain"
+          },
+          "type_local": {
+            "enum": [
+              "Maison",
+              "Appartement"
+            ],
+            "title": "Type Local",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type_local",
+          "surface",
+          "pieces"
+        ],
+        "title": "EstimateQuery",
+        "type": "object"
+      },
+      "Estimation": {
+        "properties": {
+          "avertissements": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Avertissements",
+            "type": "array"
+          },
+          "date_valeur": {
+            "format": "date",
+            "title": "Date Valeur",
+            "type": "string"
+          },
+          "facteurs": {
+            "items": {
+              "$ref": "#/components/schemas/Facteur"
+            },
+            "title": "Facteurs",
+            "type": "array"
+          },
+          "horizon": {
+            "title": "Horizon",
+            "type": "integer"
+          },
+          "localisation": {
+            "$ref": "#/components/schemas/Localisation"
+          },
+          "prix_m2": {
+            "$ref": "#/components/schemas/Fourchette"
+          },
+          "risques_actuels": {
+            "$ref": "#/components/schemas/RisquesActuels"
+          },
+          "scenarios": {
+            "items": {
+              "$ref": "#/components/schemas/Scenario"
+            },
+            "title": "Scenarios",
+            "type": "array"
+          },
+          "surface": {
+            "title": "Surface",
+            "type": "number"
+          },
+          "type_local": {
+            "enum": [
+              "Maison",
+              "Appartement"
+            ],
+            "title": "Type Local",
+            "type": "string"
+          },
+          "valeur": {
+            "$ref": "#/components/schemas/Fourchette"
+          }
+        },
+        "required": [
+          "localisation",
+          "date_valeur",
+          "type_local",
+          "surface",
+          "prix_m2",
+          "valeur",
+          "risques_actuels",
+          "horizon",
+          "scenarios",
+          "facteurs",
+          "avertissements"
+        ],
+        "title": "Estimation",
+        "type": "object"
+      },
+      "Facteur": {
+        "properties": {
+          "contribution_pct": {
+            "description": "Effet multiplicatif sur le prix, en %",
+            "title": "Contribution Pct",
+            "type": "number"
+          },
+          "libelle": {
+            "title": "Libelle",
+            "type": "string"
+          },
+          "valeur": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Valeur d'entrée (null pour les variables de voisinage)",
+            "title": "Valeur"
+          },
+          "variable": {
+            "title": "Variable",
+            "type": "string"
+          }
+        },
+        "required": [
+          "variable",
+          "libelle",
+          "contribution_pct"
+        ],
+        "title": "Facteur",
+        "type": "object"
+      },
+      "Fourchette": {
+        "properties": {
+          "p10": {
+            "title": "P10",
+            "type": "number"
+          },
+          "p50": {
+            "title": "P50",
+            "type": "number"
+          },
+          "p90": {
+            "title": "P90",
+            "type": "number"
+          }
+        },
+        "required": [
+          "p10",
+          "p50",
+          "p90"
+        ],
+        "title": "Fourchette",
+        "type": "object"
+      },
+      "Health": {
+        "properties": {
+          "database": {
+            "enum": [
+              "ok",
+              "indisponible"
+            ],
+            "title": "Database",
+            "type": "string"
+          },
+          "departements": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Departements",
+            "type": "array"
+          },
+          "model": {
+            "enum": [
+              "ok",
+              "indisponible"
+            ],
+            "title": "Model",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "ok",
+              "degrade"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "database",
+          "model",
+          "departements"
+        ],
+        "title": "Health",
+        "type": "object"
+      },
+      "HexCell": {
+        "properties": {
+          "h3": {
+            "title": "H3",
+            "type": "string"
+          },
+          "n_ventes": {
+            "minimum": 5.0,
+            "title": "N Ventes",
+            "type": "integer"
+          },
+          "prix_m2_median": {
+            "title": "Prix M2 Median",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "h3",
+          "n_ventes",
+          "prix_m2_median"
+        ],
+        "title": "HexCell",
+        "type": "object"
+      },
+      "Localisation": {
+        "properties": {
+          "code_insee": {
+            "title": "Code Insee",
+            "type": "string"
+          },
+          "code_iris": {
+            "title": "Code Iris",
+            "type": "string"
+          },
+          "nom_commune": {
+            "title": "Nom Commune",
+            "type": "string"
+          },
+          "score_geocodage": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score Geocodage"
+          },
+          "source": {
+            "enum": [
+              "coordonnees",
+              "adresse_ban"
+            ],
+            "title": "Source",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code_insee",
+          "nom_commune",
+          "code_iris",
+          "source"
+        ],
+        "title": "Localisation",
+        "type": "object"
+      },
+      "Meta": {
+        "properties": {
+          "limit": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Limit"
+          },
+          "page": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page"
+          },
+          "sources": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Sources",
+            "type": "array"
+          },
+          "total": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total"
+          }
+        },
+        "title": "Meta",
+        "type": "object"
+      },
+      "RisquesActuels": {
+        "properties": {
+          "azi": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Azi"
+          },
+          "in_tri": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "In Tri"
+          },
+          "n_catnat_10ans": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "N Catnat 10Ans"
+          },
+          "ppri": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ppri"
+          },
+          "rga_exposition": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rga Exposition"
+          },
+          "termes": {
+            "description": "Risques déjà présents, déjà dans le prix",
+            "items": {
+              "type": "string"
+            },
+            "title": "Termes",
+            "type": "array"
+          }
+        },
+        "required": [
+          "termes",
+          "n_catnat_10ans",
+          "in_tri",
+          "ppri",
+          "azi",
+          "rga_exposition"
+        ],
+        "title": "RisquesActuels",
+        "type": "object"
+      },
+      "Scenario": {
+        "properties": {
+          "composantes": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Composantes",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "libelle": {
+            "title": "Libelle",
+            "type": "string"
+          },
+          "location_interdite_depuis": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location Interdite Depuis"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message"
+          },
+          "non_inclus": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Non Inclus",
+            "type": "array"
+          },
+          "prix_m2": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Fourchette"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "sensibilite": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Sensibilite"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "statut": {
+            "enum": [
+              "calcule",
+              "non_applicable",
+              "indisponible (DRIAS)",
+              "effet_non_estime"
+            ],
+            "title": "Statut",
+            "type": "string"
+          },
+          "valeur": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Fourchette"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "libelle",
+          "statut"
+        ],
+        "title": "Scenario",
+        "type": "object"
+      },
+      "Sensibilite": {
+        "properties": {
+          "avec_voisinage": {
+            "$ref": "#/components/schemas/Fourchette"
+          },
+          "risques": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Risques",
+            "type": "array"
+          },
+          "sans_voisinage": {
+            "$ref": "#/components/schemas/Fourchette"
+          },
+          "statut": {
+            "title": "Statut",
+            "type": "string"
+          }
+        },
+        "required": [
+          "statut",
+          "risques",
+          "avec_voisinage",
+          "sans_voisinage"
+        ],
+        "title": "Sensibilite",
+        "type": "object"
+      },
+      "StatsGroupe": {
+        "description": "Groupe (type, année) d'au moins 5 ventes ; quartiles à partir de 11 (ADR 0005).",
+        "properties": {
+          "annee": {
+            "title": "Annee",
+            "type": "integer"
+          },
+          "n_ventes": {
+            "minimum": 5.0,
+            "title": "N Ventes",
+            "type": "integer"
+          },
+          "prix_m2_median": {
+            "title": "Prix M2 Median",
+            "type": "number"
+          },
+          "prix_m2_q1": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "null sous 11 ventes",
+            "title": "Prix M2 Q1"
+          },
+          "prix_m2_q3": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "null sous 11 ventes",
+            "title": "Prix M2 Q3"
+          },
+          "surface_mediane": {
+            "description": "Surface habitable médiane, arrondie à 5 m²",
+            "title": "Surface Mediane",
+            "type": "number"
+          },
+          "type_local": {
+            "title": "Type Local",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type_local",
+          "annee",
+          "n_ventes",
+          "prix_m2_q1",
+          "prix_m2_median",
+          "prix_m2_q3",
+          "surface_mediane"
+        ],
+        "title": "StatsGroupe",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "description": "API ATLAS 2050.\n\nToutes les réponses suivent l'enveloppe {success, data, error, meta}. Aucune vente isolée ni adresse n'est renvoyée (ADR 0005). Tuiles vectorielles : Martin (docs/api/README.md).",
+    "title": "ATLAS 2050 API",
+    "version": "0.4.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/communes": {
+      "get": {
+        "description": "Préfixe du nom, insensible à la casse et aux accents ; 10 résultats au plus, les communes les plus peuplées en adresses d'abord.",
+        "operationId": "search_communes_communes_get",
+        "parameters": [
+          {
+            "description": "Début du nom",
+            "in": "query",
+            "name": "q",
+            "required": true,
+            "schema": {
+              "description": "Début du nom",
+              "maxLength": 64,
+              "minLength": 2,
+              "title": "Q",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_list_CommuneHit__"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_NoneType_"
+                }
+              }
+            },
+            "description": "Paramètres refusés"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_NoneType_"
+                }
+              }
+            },
+            "description": "Ressource introuvable"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_NoneType_"
+                }
+              }
+            },
+            "description": "Paramètres invalides"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_NoneType_"
+                }
+              }
+            },
+            "description": "Trop de requêtes"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_NoneType_"
+                }
+              }
+            },
+            "description": "Base, modèle ou géocodage indisponible"
+          }
+        },
+        "summary": "Recherche de commune par préfixe"
+      }
+    },
+    "/communes/{code}/risques": {
+      "get": {
+        "description": "Cat-Nat, TRI, PPRI, AZI (Géorisques) et répartition RGA des IRIS.",
+        "operationId": "commune_risks_communes__code__risques_get",
+        "parameters": [
+          {
+            "description": "Code INSEE (5 caractères)",
+            "in": "path",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "description": "Code INSEE (5 caractères)",
+              "pattern": "^(\\d{5}|2[AB]\\d{3})$",
+              "title": "Code",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_CommuneRisques_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_NoneType_"
+                }
+              }
+            },
+            "description": "Paramètres refusés"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_NoneType_"
+                }
+              }
+            },
+            "description": "Ressource introuvable"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_NoneType_"
+                }
+              }
+            },
+            "description": "Paramètres invalides"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_NoneType_"
+                }
+              }
+            },
+            "description": "Trop de requêtes"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_NoneType_"
+                }
+              }
+            },
+            "description": "Base, modèle ou géocodage indisponible"
+          }
+        },
+        "summary": "Risques naturels actuels d'une commune"
+      }
+    },
+    "/communes/{code}/stats": {
+      "get": {
+        "description": "Groupes d'au moins 5 ventes ; quartiles à partir de 11 ; prix arrondis à 10 €/m² (ADR 0005).",
+        "operationId": "commune_stats_communes__code__stats_get",
+        "parameters": [
+          {
+            "description": "Code INSEE (5 caractères)",
+            "in": "path",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "description": "Code INSEE (5 caractères)",
+              "pattern": "^(\\d{5}|2[AB]\\d{3})$",
+              "title": "Code",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_CommuneStats_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_NoneType_"
+                }
+              }
+            },
+            "description": "Paramètres refusés"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_NoneType_"
+                }
+              }
+            },
+            "description": "Ressource introuvable"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_NoneType_"
+                }
+              }
+            },
+            "description": "Paramètres invalides"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_NoneType_"
+                }
+              }
+            },
+            "description": "Trop de requêtes"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_NoneType_"
+                }
+              }
+            },
+            "description": "Base, modèle ou géocodage indisponible"
+          }
+        },
+        "summary": "Prix d'une commune par type de bien et année"
+      }
+    },
+    "/estimate": {
+      "get": {
+        "description": "Position par lat+lon et caractéristiques en chaîne de requête. Pour une adresse, utiliser POST /estimate (une adresse n'est jamais mise dans une URL). Renvoie le prix/m² en fourchette P10-P50-P90, les risques actuels de la commune, les scénarios 2050 (statu quo, rénovation en D, sensibilité « nouveau risque » NON CAUSALE à deux bornes, climat : « indisponible (DRIAS) », jamais chiffré) et les principaux facteurs SHAP. Réponse non mise en cache (no-store).",
+        "operationId": "estimate_estimate_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "type_local",
+            "required": true,
+            "schema": {
+              "enum": [
+                "Maison",
+                "Appartement"
+              ],
+              "title": "Type Local",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Surface habitable, m²",
+            "in": "query",
+            "name": "surface",
+            "required": true,
+            "schema": {
+              "description": "Surface habitable, m²",
+              "maximum": 1000,
+              "minimum": 9,
+              "title": "Surface",
+              "type": "number"
+            }
+          },
+          {
+            "in": "query",
+            "name": "pieces",
+            "required": true,
+            "schema": {
+              "maximum": 30,
+              "minimum": 1,
+              "title": "Pieces",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "surface_terrain",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 10000,
+                  "minimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Surface Terrain"
+            }
+          },
+          {
+            "in": "query",
+            "name": "dependances",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "maximum": 10,
+              "minimum": 0,
+              "title": "Dependances",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "dpe",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "A",
+                    "B",
+                    "C",
+                    "D",
+                    "E",
+                    "F",
+                    "G"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Dpe"
+            }
+          },
+          {
+            "in": "query",
+            "name": "lat",
+            "required": true,
+            "schema": {
+              "maximum": 90,
+              "minimum": -90,
+              "title": "Lat",
+              "type": "number"
+            }
+          },
+          {
+            "in": "query",
+            "name": "lon",
+            "required": true,
+            "schema": {
+              "maximum": 180,
+              "minimum": -180,
+              "title": "Lon",
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_Estimation_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_NoneType_"
+                }
+              }
+            },
+            "description": "Paramètres refusés"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_NoneType_"
+                }
+              }
+            },
+            "description": "Ressource introuvable"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_NoneType_"
+                }
+              }
+            },
+            "description": "Paramètres invalides"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_NoneType_"
+                }
+              }
+            },
+            "description": "Trop de requêtes"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_NoneType_"
+                }
+              }
+            },
+            "description": "Base, modèle ou géocodage indisponible"
+          }
+        },
+        "summary": "Estimation d'un bien fictif par coordonnées et projection 2050"
+      },
+      "post": {
+        "description": "Corps JSON : position (lat+lon, ou adresse géocodée par la BAN, jamais journalisée ni renvoyée) et caractéristiques. Renvoie le prix/m² en fourchette P10-P50-P90, les risques actuels de la commune, les scénarios 2050 (statu quo, rénovation en D, sensibilité « nouveau risque » NON CAUSALE à deux bornes, climat : « indisponible (DRIAS) », jamais chiffré) et les principaux facteurs SHAP. Réponse non mise en cache (no-store).",
+        "operationId": "estimate_post_estimate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EstimateQuery"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_Estimation_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_NoneType_"
+                }
+              }
+            },
+            "description": "Paramètres refusés"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_NoneType_"
+                }
+              }
+            },
+            "description": "Ressource introuvable"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_NoneType_"
+                }
+              }
+            },
+            "description": "Paramètres invalides"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_NoneType_"
+                }
+              }
+            },
+            "description": "Trop de requêtes"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_NoneType_"
+                }
+              }
+            },
+            "description": "Base, modèle ou géocodage indisponible"
+          }
+        },
+        "summary": "Estimation d'un bien fictif par adresse ou coordonnées et projection 2050"
+      }
+    },
+    "/health": {
+      "get": {
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_Health_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_Health_"
+                }
+              }
+            },
+            "description": "Base indisponible"
+          }
+        },
+        "summary": "État de l'API, de la base et du modèle"
+      }
+    },
+    "/hex": {
+      "get": {
+        "description": "Lus dans gold.agg_hex (≥ 5 ventes, suppression secondaire, prix arrondis à 10 €/m², ADR 0005) ; jamais calculés à la volée. Hexagones dont le centre est dans l'emprise. Au-delà du plafond de lignes, la requête est refusée (réduire l'emprise).",
+        "operationId": "hex_cells_hex_get",
+        "parameters": [
+          {
+            "description": "Emprise « xmin,ymin,xmax,ymax » en degrés WGS 84 (EPSG:4326)",
+            "in": "query",
+            "name": "bbox",
+            "required": true,
+            "schema": {
+              "description": "Emprise « xmin,ymin,xmax,ymax » en degrés WGS 84 (EPSG:4326)",
+              "examples": [
+                "-0.75,44.75,-0.45,44.95"
+              ],
+              "maxLength": 120,
+              "title": "Bbox",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Résolution H3 : 7 (≈ 5 km²) ou 9 (≈ 0,1 km²)",
+            "in": "query",
+            "name": "res",
+            "required": true,
+            "schema": {
+              "description": "Résolution H3 : 7 (≈ 5 km²) ou 9 (≈ 0,1 km²)",
+              "maximum": 9,
+              "minimum": 7,
+              "title": "Res",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "type",
+            "required": false,
+            "schema": {
+              "default": "tous",
+              "enum": [
+                "Maison",
+                "Appartement",
+                "tous"
+              ],
+              "title": "Type",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "dpe",
+            "required": false,
+            "schema": {
+              "default": "tous",
+              "enum": [
+                "A",
+                "B",
+                "C",
+                "D",
+                "E",
+                "F",
+                "G",
+                "tous"
+              ],
+              "title": "Dpe",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "annee",
+            "required": false,
+            "schema": {
+              "default": "tous",
+              "pattern": "^(tous|20\\d\\d)$",
+              "title": "Annee",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_list_HexCell__"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_NoneType_"
+                }
+              }
+            },
+            "description": "Paramètres refusés"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_NoneType_"
+                }
+              }
+            },
+            "description": "Ressource introuvable"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_NoneType_"
+                }
+              }
+            },
+            "description": "Paramètres invalides"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_NoneType_"
+                }
+              }
+            },
+            "description": "Trop de requêtes"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope_NoneType_"
+                }
+              }
+            },
+            "description": "Base, modèle ou géocodage indisponible"
+          }
+        },
+        "summary": "Agrégats de prix par hexagone H3"
+      }
+    }
+  }
+}

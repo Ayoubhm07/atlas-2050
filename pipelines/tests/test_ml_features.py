@@ -40,7 +40,7 @@ def test_only_strictly_earlier_sales_are_used() -> None:
             ("2023-01-01", CELL, "Maison", np.log(50000)),  # postérieure
         ]
     )
-    out = neighbourhood_log_price(df, prior_weight=0.0)
+    out = neighbourhood_log_price(df, prior_weight=0.0, min_sales=1)
     # la cible (ligne 2) ne voit que la vente du 2022-01-01
     assert out.loc[2, "voisinage_n"] == 1
     assert out.loc[2, "voisinage_log_prix"] == pytest.approx(np.log(1000))
@@ -70,7 +70,7 @@ def test_reference_mask_excludes_other_fold() -> None:
         ]
     )
     reference = np.array([False, True, False])
-    out = neighbourhood_log_price(df, reference=reference, prior_weight=0.0)
+    out = neighbourhood_log_price(df, reference=reference, prior_weight=0.0, min_sales=1)
     assert out.loc[2, "voisinage_n"] == 1
     assert out.loc[2, "voisinage_log_prix"] == pytest.approx(np.log(3000))
 
@@ -83,7 +83,7 @@ def test_ring_type_and_k_limits() -> None:
         ("2022-01-16", CELL, "Appartement", np.log(99999)),
         ("2022-02-01", CELL, "Maison", np.log(2000)),
     ]
-    out = neighbourhood_log_price(_frame(rows), k=3, prior_weight=0.0)
+    out = neighbourhood_log_price(_frame(rows), k=3, prior_weight=0.0, min_sales=1)
     target = len(rows) - 1
     assert out.loc[target, "voisinage_n"] == 3  # 3 plus récentes de l'anneau, même type
     assert out.loc[target, "voisinage_log_prix"] == pytest.approx(np.log(1009))
@@ -92,7 +92,7 @@ def test_ring_type_and_k_limits() -> None:
 def test_smoothing_pulls_small_samples_to_prior() -> None:
     rows = [(f"2022-01-{d:02d}", FAR, "Maison", np.log(1000)) for d in range(1, 21)]
     rows += [("2022-01-25", CELL, "Maison", np.log(4000)), ("2022-02-01", CELL, "Maison", 0.0)]
-    out = neighbourhood_log_price(_frame(rows), prior_weight=1.0)
+    out = neighbourhood_log_price(_frame(rows), prior_weight=1.0, min_sales=1)
     value = out.loc[len(rows) - 1, "voisinage_log_prix"]
     # 1 voisin à log(4000), a priori départemental ≈ log(1000) (21 ventes antérieures),
     # poids égal : moyenne des deux
@@ -100,10 +100,44 @@ def test_smoothing_pulls_small_samples_to_prior() -> None:
     assert value == pytest.approx((np.log(4000) + prior) / 2)
 
 
+def _ring_rows(n_ring: int, price: float) -> list[tuple[str, str, str, float]]:
+    """500 ventes hors anneau (a priori) + n_ring ventes dans l'anneau, puis la cible."""
+    rows = [("2021-06-01", FAR, "Maison", np.log(3000))] * 500
+    rows += [(f"2022-01-{d:02d}", CELL, "Maison", np.log(2000)) for d in range(1, n_ring)]
+    if n_ring:
+        rows.append(("2022-01-20", CELL, "Maison", np.log(price)))
+    rows.append(("2022-02-01", CELL, "Maison", 0.0))
+    return rows
+
+
+@pytest.mark.parametrize("n_ring", [1, 2, 4])
+def test_below_min_sales_uses_prior_only(n_ring: int) -> None:
+    """ADR 0005 : moins de 5 ventes d'anneau → a priori seul, n = 0, aucune vente lisible."""
+    outs = [
+        neighbourhood_log_price(_frame(_ring_rows(n_ring, price))).iloc[-1]
+        for price in (500.0, 3000.0, 50000.0)
+    ]
+    no_ring = neighbourhood_log_price(_frame(_ring_rows(0, 1.0))).iloc[-1]
+    for out in outs:
+        assert out["voisinage_n"] == 0
+        assert out["voisinage_log_prix"] == pytest.approx(no_ring["voisinage_log_prix"])
+
+
+def test_at_min_sales_neighbours_are_used() -> None:
+    out = neighbourhood_log_price(_frame(_ring_rows(5, 2000.0))).iloc[-1]
+    assert out["voisinage_n"] == 5
+    prior = np.log(3000)
+    assert out["voisinage_log_prix"] == pytest.approx((5 * np.log(2000) + 5 * prior) / 10)
+
+
 def test_rejects_bad_inputs() -> None:
     df = _frame([("2022-01-01", CELL, "Maison", 7.0)])
     with pytest.raises(ValueError, match="k"):
         neighbourhood_log_price(df, k=0)
+    with pytest.raises(ValueError, match="min_sales"):
+        neighbourhood_log_price(df, min_sales=0)
+    with pytest.raises(ValueError, match="min_sales"):
+        neighbourhood_log_price(df, k=3, min_sales=4)
     with pytest.raises(ValueError, match="reference"):
         neighbourhood_log_price(df, reference=np.array([True, False]))
     with pytest.raises(KeyError):

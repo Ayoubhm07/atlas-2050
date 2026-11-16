@@ -8,11 +8,13 @@ Chaque requête est exécutée 1 fois à blanc puis 10 fois ; on garde la média
 
 from __future__ import annotations
 
+import datetime as dt
 import re
 import statistics
 import sys
 from pathlib import Path
 
+import h3
 import psycopg
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "pipelines"))
@@ -20,11 +22,20 @@ from atlas_pipelines.load.postgis import conninfo_from_env  # noqa: E402
 
 PARAMS: dict[str, tuple[object, ...]] = {
     # emprise de Bordeaux Métropole (≈ 25 × 20 km), maisons et appartements, 2024
-    "hex_aggregates": (9, -0.75, 44.75, -0.45, 44.95, "tous", "2024", "tous"),
+    "hex_aggregates": (9, -0.75, 44.75, -0.45, 44.95, "tous", "2024", "tous", 5001),
     "commune_search": ("bord",),
     "point_lookup": (-0.5792, 44.8378),  # Bordeaux centre
     "commune_transaction_stats": ("33063",),
     "commune_risks": ("33063",),
+    "valuation_date": (),
+    # anneau H3 r7 du centre de Bordeaux (7 cellules), maisons, avant le 2025-01-01
+    "neighbour_sales": (
+        "Maison",
+        sorted(h3.grid_disk(h3.latlng_to_cell(44.8378, -0.5792, 7), 1)),
+        dt.date(2025, 1, 1),
+        30,
+        500,
+    ),
 }
 SEARCH_CHECKS = ("étau", "Étau", "ETAU", "etau")
 

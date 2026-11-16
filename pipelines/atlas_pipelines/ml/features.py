@@ -8,6 +8,12 @@ a priori départemental (médiane des `n_prior` dernières ventes de référence
 type, elles aussi antérieures), avec un poids `prior_weight` en ventes fictives :
   lissé = (n · médiane_voisins + m · a_priori) / (n + m)
 
+Seuil de confidentialité (ADR 0005, agrégats d'au moins 5 ventes) : si l'anneau compte
+moins de `min_sales` ventes de référence, la médiane des voisins n'est PAS utilisée ;
+la variable vaut l'a priori seul et `voisinage_n` vaut 0. Sans ce seuil, une seule
+vente voisine se lirait à travers l'estimation de l'API. La même règle s'applique à
+l'entraînement et au service (l'API appelle cette fonction).
+
 `reference` restreint les ventes qui peuvent servir de voisines : en validation
 croisée, seules celles du pli d'entraînement ; en test temporel, seules celles de la
 période d'entraînement. La cible n'entre donc jamais dans sa propre variable.
@@ -23,6 +29,7 @@ import numpy as np
 import pandas as pd
 
 NEIGHBOUR_COLUMNS: tuple[str, ...] = ("voisinage_log_prix", "voisinage_n")
+MIN_NEIGHBOUR_SALES = 5  # ADR 0005 : jamais moins de 5 ventes dans un agrégat
 _REQUIRED = ("date_mutation", "h3_r7", "type_local", "log_prix_m2")
 _EPOCH = (2021, 1)  # t_mois = 0 en janvier 2021
 
@@ -72,6 +79,7 @@ def neighbourhood_log_price(
     ring: int = 1,
     prior_weight: float = 5.0,
     n_prior: int = 500,
+    min_sales: int = MIN_NEIGHBOUR_SALES,
 ) -> pd.DataFrame:
     """Renvoie `voisinage_log_prix` (lissé) et `voisinage_n`, alignés sur `df.index`."""
     missing = [c for c in _REQUIRED if c not in df.columns]
@@ -79,6 +87,8 @@ def neighbourhood_log_price(
         raise KeyError(f"Colonnes manquantes : {missing}")
     if k < 1 or n_prior < 1 or prior_weight < 0:
         raise ValueError("k et n_prior doivent être ≥ 1, prior_weight ≥ 0")
+    if not 1 <= min_sales <= k:
+        raise ValueError(f"min_sales doit être entre 1 et k ({k}) : {min_sales}")
     n = len(df)
     ref = np.ones(n, dtype=bool) if reference is None else np.asarray(reference, dtype=bool)
     if ref.shape != (n,):
@@ -118,6 +128,8 @@ def neighbourhood_log_price(
             keep = np.argsort(all_days, kind="stable")[-k:]
             all_vals = all_vals[keep]
         m = len(all_vals)
+        if m < min_sales:  # seuil ADR 0005 : l'a priori seul, aucune vente lisible
+            m = 0
         counts[i] = m
         if m == 0:
             smoothed[i] = prior
