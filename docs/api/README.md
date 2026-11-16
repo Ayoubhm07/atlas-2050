@@ -56,6 +56,12 @@ jamais écrit ni journalisé ; les échecs ne sont pas mis en cache.
   « indisponible (DRIAS) » sans aucun chiffre), 6 facteurs SHAP (TreeSHAP natif de
   LightGBM). Les variables de voisinage et la position sont données en contribution,
   jamais en valeur.
+- `explication` (sprint 5, waterfall du front) : `base_prix_m2` (valeur attendue du
+  modèle, constante, arrondie à 10 €), `autres_pct` (effet cumulé des variables hors des
+  6 facteurs) et `prix_m2_modele` (prédiction ponctuelle, arrondie à 10 €). TreeSHAP est
+  additif en log-prix : base × Π(1 + facteur) × (1 + autres) = prédiction, aux arrondis
+  près (test `test_estimate_waterfall_closes_on_model_prediction`). La prédiction
+  ponctuelle diffère de la médiane P50 de la fourchette, tirée avec les résidus.
 - Une estimation coûte 5 jetons du limiteur (60/minute par IP par défaut).
 
 ## Limitation de débit et IP client

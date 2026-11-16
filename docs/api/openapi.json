@@ -576,6 +576,9 @@
             "title": "Date Valeur",
             "type": "string"
           },
+          "explication": {
+            "$ref": "#/components/schemas/Explication"
+          },
           "facteurs": {
             "items": {
               "$ref": "#/components/schemas/Facteur"
@@ -630,9 +633,37 @@
           "horizon",
           "scenarios",
           "facteurs",
+          "explication",
           "avertissements"
         ],
         "title": "Estimation",
+        "type": "object"
+      },
+      "Explication": {
+        "description": "Bouclage du waterfall SHAP (TreeSHAP natif, log-prix additif).\n\nprix_m2_modele = base_prix_m2 × Π(1 + contribution_pct/100 des facteurs) ×\n(1 + autres_pct/100), aux arrondis près. Prédiction ponctuelle du modèle, distincte\nde la médiane P50 de la fourchette (tirée avec les résidus).",
+        "properties": {
+          "autres_pct": {
+            "description": "Effet multiplicatif cumulé des variables hors des facteurs listés, en %",
+            "title": "Autres Pct",
+            "type": "number"
+          },
+          "base_prix_m2": {
+            "description": "Prix/m² de référence du modèle (valeur attendue, tous biens), arrondi 10 €",
+            "title": "Base Prix M2",
+            "type": "number"
+          },
+          "prix_m2_modele": {
+            "description": "Prédiction ponctuelle du modèle (€/m², arrondie 10 €), avant incertitude",
+            "title": "Prix M2 Modele",
+            "type": "number"
+          }
+        },
+        "required": [
+          "base_prix_m2",
+          "autres_pct",
+          "prix_m2_modele"
+        ],
+        "title": "Explication",
         "type": "object"
       },
       "Facteur": {

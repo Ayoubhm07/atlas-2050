@@ -1,0 +1,46 @@
+{
+  "name": "atlas-web",
+  "version": "0.5.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "predev": "node scripts/copy-maplibre-worker.mjs",
+    "dev": "next dev --port 3000",
+    "prebuild": "node scripts/copy-maplibre-worker.mjs",
+    "build": "next build",
+    "start": "next start --port 3000",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "budget": "node scripts/bundle-budget.mjs"
+  },
+  "engines": {
+    "node": ">=20.9"
+  },
+  "dependencies": {
+    "@deck.gl/core": "9.4.1",
+    "@deck.gl/layers": "9.4.1",
+    "@deck.gl/mapbox": "9.4.1",
+    "h3-js": "4.5.0",
+    "maplibre-gl": "6.18.0",
+    "next": "16.4.6",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "server-only": "0.0.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.65.1",
+    "@testing-library/dom": "10.4.2",
+    "@testing-library/react": "16.3.3",
+    "@types/node": "26.6.6",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitest/coverage-v8": "5.1.0",
+    "eslint": "9.39.5",
+    "eslint-config-next": "16.4.6",
+    "jsdom": "29.1.1",
+    "typescript": "6.0.3",
+    "vitest": "5.1.0"
+  }
+}

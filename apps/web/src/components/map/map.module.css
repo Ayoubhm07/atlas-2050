@@ -1,0 +1,334 @@
+.mapWrap {
+  position: absolute;
+  inset: 0;
+  transition: opacity 700ms var(--ease-out);
+}
+
+/* la carte reste invisible (l'affiche devant) tant que ses hexagones ne sont pas dessinés */
+.mapWrap[data-ready="false"] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.map {
+  position: absolute;
+  inset: 0;
+}
+
+.map :global(canvas.maplibregl-canvas:focus-visible) {
+  outline: 3px solid var(--focus);
+  outline-offset: -3px;
+}
+
+.mapInner {
+  width: 100%;
+  height: 100%;
+}
+
+
+@media (max-width: 959px) {
+  .map :global(.maplibregl-ctrl-top-right) {
+    top: 3.4rem;
+  }
+}
+
+.map :global(.maplibregl-ctrl-group) {
+  background: var(--ink-2);
+  border: 1px solid var(--rule);
+  box-shadow: none;
+}
+
+.map :global(.maplibregl-ctrl-group button) {
+  width: 36px;
+  height: 36px;
+}
+
+.map :global(.maplibregl-ctrl-group button + button) {
+  border-top: 1px solid var(--rule);
+}
+
+.map :global(.maplibregl-ctrl-icon) {
+  filter: invert(0.92);
+}
+
+.map :global(.maplibregl-ctrl.maplibregl-ctrl-attrib),
+.map :global(.maplibregl-ctrl.maplibregl-ctrl-attrib.maplibregl-compact),
+.map :global(.maplibregl-ctrl.maplibregl-ctrl-attrib.maplibregl-compact-show) {
+  background: rgba(7, 9, 13, 0.85);
+  color: var(--paper-dim);
+  font-size: 0.72rem;
+}
+
+.map :global(.maplibregl-ctrl-attrib-button) {
+  filter: invert(0.9);
+}
+
+.map :global(.maplibregl-cooperative-gesture-screen) {
+  background: rgba(7, 9, 13, 0.75);
+  color: var(--paper);
+  font-size: 1rem;
+}
+
+/* --- surcouches -------------------------------------------------------------------- */
+
+.chip {
+  position: absolute;
+  left: 0.75rem;
+  top: 0.75rem;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(13, 17, 24, 0.9);
+  border: 1px solid var(--rule);
+  font-size: 0.85rem;
+  color: var(--paper-dim);
+  max-width: calc(100% - 5rem);
+}
+
+.dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: var(--gold);
+  flex: none;
+  animation: pulse 1.1s var(--ease-in-out) infinite alternate;
+}
+
+@keyframes pulse {
+  from {
+    opacity: 0.35;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.raise {
+  position: absolute;
+  left: 50%;
+  bottom: 1.25rem;
+  transform: translateX(-50%);
+  z-index: 3;
+}
+
+/* Terra incognita : à 2050, la carte se couvre de hachures, de gauche à droite. */
+.incognita {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(135deg, rgba(236, 230, 214, 0.16) 0 1px, transparent 1px 9px);
+  background-color: rgba(7, 9, 13, 0.38);
+  clip-path: inset(0 0 0 0);
+  animation: wipe 1100ms var(--ease-in-out) both;
+}
+
+@keyframes wipe {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+.cartouche {
+  position: absolute;
+  z-index: 4;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(30rem, calc(100% - 2rem));
+  background: rgba(10, 13, 19, 0.94);
+  border: 1px solid var(--hatch-strong);
+  border-radius: 12px;
+  padding: 1.1rem 1.25rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  animation: rise 600ms var(--ease-out) 500ms both;
+}
+
+.cartouche h3 {
+  font-size: 1.3rem;
+  margin-bottom: 0.4rem;
+}
+
+.cartouche p {
+  font-size: 0.95rem;
+  color: var(--paper-dim);
+  margin-bottom: 0.6rem;
+}
+
+@media (max-width: 959px) {
+  /* téléphone : bandeau bas compact, les hachures restent visibles au-dessus */
+  .cartouche {
+    top: auto;
+    bottom: 0.5rem;
+    transform: translateX(-50%);
+    width: calc(100% - 1rem);
+    max-height: 48%;
+    overflow-y: auto;
+    padding: 0.75rem 0.9rem;
+    animation-name: riseBottom;
+  }
+  .cartouche h3 {
+    font-size: 1.1rem;
+  }
+  .cartouche p {
+    font-size: 0.86rem;
+    margin-bottom: 0.4rem;
+  }
+  .cartoucheLong {
+    display: none;
+  }
+}
+
+@keyframes riseBottom {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 12px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+@media (pointer: coarse) {
+  .map :global(.maplibregl-ctrl-group button) {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translate(-50%, calc(-50% + 12px));
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
+.selection {
+  position: absolute;
+  z-index: 4;
+  left: 0.75rem;
+  right: 0.75rem;
+  bottom: 0.75rem;
+  max-width: 24rem;
+  background: rgba(10, 13, 19, 0.95);
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  padding: 0.9rem 1rem;
+  font-size: 0.93rem;
+}
+
+.selection dl {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.15rem 0.8rem;
+  margin: 0.3rem 0 0.75rem;
+}
+
+.selection dt {
+  color: var(--muted);
+}
+
+.selection dd {
+  margin: 0;
+}
+
+.selRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.close {
+  position: absolute;
+  right: 0.4rem;
+  top: 0.4rem;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  background: transparent;
+  color: var(--paper-dim);
+  font-size: 1.3rem;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+/* --- réglages ----------------------------------------------------------------------- */
+
+.controls {
+  display: grid;
+  gap: 1.1rem;
+}
+
+.ruler {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr)) minmax(0, 1.1fr);
+}
+
+.ruler span {
+  padding-inline: 0.3rem;
+  font-size: 0.84rem;
+}
+
+.legend {
+  display: grid;
+  gap: 0.3rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.86rem;
+}
+
+.legend li {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.swatch {
+  width: 1.6rem;
+  height: 0.8rem;
+  border-radius: 3px;
+  flex: none;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 44px;
+  cursor: pointer;
+}
+
+.check input {
+  width: 1.15rem;
+  height: 1.15rem;
+  accent-color: var(--gold);
+}
+
+.row2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .incognita,
+  .cartouche {
+    animation: none;
+    opacity: 1;
+  }
+  .dot {
+    animation: none;
+  }
+}

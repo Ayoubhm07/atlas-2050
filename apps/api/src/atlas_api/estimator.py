@@ -55,6 +55,7 @@ from atlas_api.db import PointContext, ReferenceSale
 from atlas_api.schemas import (
     EstimateQuery,
     Estimation,
+    Explication,
     Facteur,
     Fourchette,
     Localisation,
@@ -238,9 +239,18 @@ class Estimator:
     def predict_log(self, X: pd.DataFrame) -> float:
         return float(np.asarray(self.bundle.model.predict(X), dtype=float)[0])
 
-    def factors(self, X: pd.DataFrame, q: EstimateQuery) -> tuple[Facteur, ...]:
+    def factors(
+        self, X: pd.DataFrame, q: EstimateQuery
+    ) -> tuple[tuple[Facteur, ...], Explication]:
+        """Six principaux facteurs SHAP et bouclage du waterfall (base, reste, prédiction).
+
+        TreeSHAP est additif en log-prix : base + Σ contributions = prédiction. Les
+        facteurs non listés sont regroupés dans `autres_pct` pour que le waterfall se
+        referme sur la prédiction ponctuelle du modèle.
+        """
         booster, mat = self._matrix(X)
-        contrib = np.asarray(booster.predict(mat, pred_contrib=True), dtype=float)[0][:-1]
+        row = np.asarray(booster.predict(mat, pred_contrib=True), dtype=float)[0]
+        contrib, bias = row[:-1], float(row[-1])
         shown: dict[str, float | None] = {
             "log_surface": q.surface,
             "log_terrain": q.surface_terrain if q.type_local == "Maison" else None,
@@ -266,7 +276,13 @@ class Estimator:
                     valeur=value,
                 )
             )
-        return tuple(out)
+        rest = float(contrib.sum() - contrib[order].sum())
+        explication = Explication(
+            base_prix_m2=round(math.exp(bias) / 10) * 10,
+            autres_pct=round(math.expm1(rest) * 100, 1),
+            prix_m2_modele=round(math.exp(bias + float(contrib.sum())) / 10) * 10,
+        )
+        return tuple(out), explication
 
     # -- projection ------------------------------------------------------------------
 
@@ -356,6 +372,7 @@ class Estimator:
         base = Bien(prix, q.surface, q.type_local, None, terrain, risques)
         actuel = self._project(base, Hypotheses(HORIZON))
         bien = Bien(prix, q.surface, q.type_local, q.dpe, terrain, risques)
+        facteurs, explication = self.factors(X, q)
         return Estimation(
             localisation=localisation,
             date_valeur=valuation_date,
@@ -373,7 +390,8 @@ class Estimator:
             ),
             horizon=HORIZON,
             scenarios=self.scenarios(bien),
-            facteurs=self.factors(X, q),
+            facteurs=facteurs,
+            explication=explication,
             avertissements=self._warnings(valuation_date),
         )
 

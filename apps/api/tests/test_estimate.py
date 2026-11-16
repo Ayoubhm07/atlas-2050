@@ -95,6 +95,27 @@ def test_estimate_factors_hide_neighbour_values(client: TestClient) -> None:
         assert by_name["log_surface"]["valeur"] == 96
 
 
+def test_estimate_waterfall_closes_on_model_prediction(client: TestClient) -> None:
+    """base × Π(1 + facteurs) × (1 + autres) = prédiction du modèle, aux arrondis près."""
+    data = client.get("/estimate", params={**POINT, **HOUSE}).json()["data"]
+    expl = data["explication"]
+    product = expl["base_prix_m2"] * (1 + expl["autres_pct"] / 100)
+    for f in data["facteurs"]:
+        product *= 1 + f["contribution_pct"] / 100
+    # arrondis : base et prédiction à 10 €, chaque pourcentage à 0,1 point (7 termes)
+    assert abs(product - expl["prix_m2_modele"]) <= 0.006 * expl["prix_m2_modele"] + 10
+    assert expl["base_prix_m2"] % 10 == 0 and expl["prix_m2_modele"] % 10 == 0
+
+
+def test_factors_rest_is_the_exact_complement(estimator: Estimator) -> None:
+    q = EstimateQuery(**POINT, **HOUSE)  # type: ignore[arg-type]
+    X = feature_row(q, CONTEXT, POINT["lon"], POINT["lat"], VALUATION, (8.0, 12))
+    facteurs, expl = estimator.factors(X, q)
+    predicted = float(np.exp(estimator.predict_log(X)))
+    assert abs(expl.prix_m2_modele - predicted) <= 5
+    assert len(facteurs) <= 6
+
+
 def test_estimate_by_address_never_echoes_it(
     client: TestClient, geocoder: FakeGeocoder, caplog: pytest.LogCaptureFixture
 ) -> None:

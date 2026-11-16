@@ -190,6 +190,25 @@ class Facteur(Frozen):
     )
 
 
+class Explication(Frozen):
+    """Bouclage du waterfall SHAP (TreeSHAP natif, log-prix additif).
+
+    prix_m2_modele = base_prix_m2 × Π(1 + contribution_pct/100 des facteurs) ×
+    (1 + autres_pct/100), aux arrondis près. Prédiction ponctuelle du modèle, distincte
+    de la médiane P50 de la fourchette (tirée avec les résidus).
+    """
+
+    base_prix_m2: float = Field(
+        description="Prix/m² de référence du modèle (valeur attendue, tous biens), arrondi 10 €"
+    )
+    autres_pct: float = Field(
+        description="Effet multiplicatif cumulé des variables hors des facteurs listés, en %"
+    )
+    prix_m2_modele: float = Field(
+        description="Prédiction ponctuelle du modèle (€/m², arrondie 10 €), avant incertitude"
+    )
+
+
 class Estimation(Frozen):
     localisation: Localisation
     date_valeur: dt.date
@@ -201,6 +220,7 @@ class Estimation(Frozen):
     horizon: int
     scenarios: tuple[Scenario, ...]
     facteurs: tuple[Facteur, ...]
+    explication: Explication
     avertissements: tuple[str, ...]
 
 

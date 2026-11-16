@@ -1,0 +1,473 @@
+.estimator {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+}
+
+@media (min-width: 1100px) {
+  .estimator {
+    grid-template-columns: minmax(22rem, 26rem) minmax(0, 1fr);
+  }
+  .form {
+    position: sticky;
+    top: 1rem;
+  }
+}
+
+.form {
+  display: grid;
+  gap: 1.4rem;
+}
+
+.bien {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+
+.bien > legend,
+.position > legend {
+  margin-bottom: 0.6rem;
+}
+
+.position {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.err {
+  color: #ffc3a8;
+  font-size: 0.86rem;
+}
+
+.compareToggle {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  min-height: 44px;
+  cursor: pointer;
+}
+
+.compareToggle input {
+  width: 1.15rem;
+  height: 1.15rem;
+  accent-color: var(--gold);
+}
+
+.submitRow {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.results {
+  display: grid;
+  gap: 1.25rem;
+  min-width: 0;
+}
+
+/* --- attente ------------------------------------------------------------------------ */
+
+.pending {
+  position: relative;
+  overflow: hidden;
+}
+
+.pendingBar {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--gold);
+  box-shadow: 0 0 24px 6px rgba(251, 231, 161, 0.35);
+  animation: survey 1.6s var(--ease-in-out) infinite;
+}
+
+@keyframes survey {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(min(60rem, 92vw));
+  }
+}
+
+/* --- fiche -------------------------------------------------------------------------- */
+
+.sheet {
+  display: grid;
+  gap: 1.1rem;
+  animation: sheetIn 500ms var(--ease-out) both;
+}
+
+.sheet h4 {
+  font-family: var(--font-display), Georgia, serif;
+  font-weight: 500;
+  font-size: 1.2rem;
+  margin: 0.8rem 0 0;
+  padding-top: 1rem;
+  border-top: 1px solid var(--rule);
+}
+
+@keyframes sheetIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+.sheetHead h3 {
+  margin-bottom: 0.3rem;
+}
+
+.headline {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 1rem 2rem;
+}
+
+.bigLabel {
+  font-size: 0.84rem;
+  color: var(--muted);
+  margin: 0 0 0.2rem;
+  font-weight: 600;
+}
+
+.big {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  line-height: 1.05;
+  margin: 0 0 0.25rem;
+  color: var(--gold);
+}
+
+.reading {
+  color: var(--paper-dim);
+  font-size: 0.97rem;
+  margin: 0;
+}
+
+/* --- jauge des fourchettes ---------------------------------------------------------------- */
+
+.gauge {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.gaugeRows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.85rem;
+}
+
+.gaugeRow {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.gaugeRow[data-tone="borne"] {
+  padding-left: 1rem;
+  gap: 0.15rem;
+}
+
+.gaugeLabel {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.15rem 1rem;
+  font-size: 0.92rem;
+}
+
+.gaugeRow[data-tone="borne"] .gaugeLabel {
+  font-size: 0.84rem;
+  color: var(--muted);
+}
+
+.track {
+  position: relative;
+  height: 14px;
+  border-radius: 7px;
+  background: var(--ink-0);
+  box-shadow: inset 0 0 0 1px var(--rule);
+}
+
+.gaugeRow[data-tone="borne"] .track {
+  height: 6px;
+}
+
+.band {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: 7px;
+  background: linear-gradient(90deg, rgba(240, 128, 84, 0.55), rgba(251, 231, 161, 0.9), rgba(240, 128, 84, 0.55));
+  animation: grow 750ms var(--ease-out) both;
+}
+
+.gaugeRow[data-tone="actuel"] .band {
+  background: linear-gradient(90deg, rgba(251, 231, 161, 0.5), var(--gold), rgba(251, 231, 161, 0.5));
+}
+
+.gaugeRow[data-tone="sens"] .band,
+.gaugeRow[data-tone="borne"] .band {
+  background: repeating-linear-gradient(135deg, rgba(156, 195, 230, 0.75) 0 3px, rgba(156, 195, 230, 0.35) 3px 6px);
+}
+
+.median {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  width: 3px;
+  margin-left: -1.5px;
+  border-radius: 2px;
+  background: var(--paper);
+  animation: fadeIn 400ms var(--ease-out) both;
+}
+
+.trackDrias {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-image: repeating-linear-gradient(135deg, var(--hatch-strong) 0 1px, transparent 1px 7px);
+  height: 22px;
+  font-size: 0.75rem;
+  color: var(--paper-dim);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.axis {
+  position: relative;
+  height: 1.4rem;
+  margin-top: 0.2rem;
+  border-top: 1px solid var(--rule);
+}
+
+.axis span {
+  position: absolute;
+  top: 0.25rem;
+  transform: translateX(-50%);
+  font-size: 0.74rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.axis span:first-child {
+  transform: none;
+}
+
+.axis span:last-child {
+  transform: translateX(-100%);
+}
+
+@keyframes grow {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+}
+
+/* --- frise --------------------------------------------------------------------------- */
+
+.frise {
+  margin: 0;
+  display: grid;
+  gap: 0.8rem;
+}
+
+.friseTrack {
+  position: relative;
+  height: 2.6rem;
+  margin-inline: 0.6rem;
+}
+
+.friseGap {
+  position: absolute;
+  top: 50%;
+  border-top: 2px dashed var(--rule);
+  font-size: 0.74rem;
+  color: var(--muted);
+  text-align: center;
+  padding-top: 0.35rem;
+}
+
+.friseNode {
+  position: absolute;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 0 4px rgba(251, 231, 161, 0.18);
+}
+
+.friseTick {
+  position: absolute;
+  top: calc(50% - 9px);
+  width: 2px;
+  height: 18px;
+  margin-left: -1px;
+  background: var(--muted);
+}
+
+.friseTick[data-active="true"] {
+  background: var(--ember);
+  width: 4px;
+  margin-left: -2px;
+}
+
+.friseList {
+  margin: 0;
+  padding-left: 1.2rem;
+  display: grid;
+  gap: 0.25rem;
+  font-size: 0.93rem;
+}
+
+.friseList li[data-active="true"] {
+  color: var(--ember);
+}
+
+/* --- waterfall ----------------------------------------------------------------------- */
+
+.waterfall {
+  margin: 0;
+  display: grid;
+  gap: 0.7rem;
+}
+
+.wfRows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.wfRow {
+  display: grid;
+  grid-template-columns: minmax(0, 15rem) minmax(0, 1fr) 5.5rem;
+  gap: 0.75rem;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 640px) {
+  .wfRow {
+    grid-template-columns: minmax(0, 1fr) 5.2rem;
+  }
+  .wfTrack {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+}
+
+.wfLabel {
+  min-width: 0;
+}
+
+.wfTrack {
+  position: relative;
+  height: 12px;
+}
+
+.wfBar {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: 3px;
+  animation: grow 600ms var(--ease-out) both;
+  transform-origin: left center;
+}
+
+.wfRow[data-kind="base"] .wfBar,
+.wfRow[data-kind="total"] .wfBar {
+  background: var(--paper-dim);
+}
+
+.wfRow[data-kind="total"] .wfBar {
+  background: var(--gold);
+}
+
+.wfRow[data-kind="hausse"] .wfBar {
+  background: var(--amber);
+}
+
+.wfRow[data-kind="baisse"] .wfBar {
+  background: var(--tide);
+  transform-origin: right center;
+}
+
+.wfRow[data-kind="total"] {
+  font-weight: 600;
+}
+
+.wfValue {
+  text-align: right;
+}
+
+/* --- inclus / non inclus, avertissements -------------------------------------------- */
+
+.inout {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 0.8rem;
+}
+
+.inout > div {
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  padding: 0.8rem 1rem;
+}
+
+.inout ul,
+.warn ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 0.92rem;
+}
+
+.warn {
+  border-top: 1px solid var(--rule);
+  padding-top: 0.6rem;
+}
+
+/* --- comparaison --------------------------------------------------------------------- */
+
+.compare {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.pair {
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 1500px) {
+  .pair {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.summary h3 {
+  font-size: 1.35rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .band,
+  .median,
+  .wfBar,
+  .sheet,
+  .pendingBar {
+    animation: none;
+  }
+}
